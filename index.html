@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2747c2">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Year-End Core Block</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow training-log column; phase tabs on top, gym/no-gym switch, A/B session cards side by side on wide screens */
+:root{
+  --bg:#eef0ed; --surface:#ffffff; --ink:#17191a; --muted:#5b625e; --line:#d6dad5; --accent:#2747c2; --accent-ink:#ffffff; --chip:#e3e7f8; --far:#a9b0ac; --figbg:#f4f6f3;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111315; --surface:#1a1d20; --ink:#e8ebe7; --muted:#9aa19d; --line:#2c3135; --accent:#8ea8ff; --accent-ink:#0f1430; --chip:#232a44; --far:#5b625f; --figbg:#141719; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111315; --surface:#1a1d20; --ink:#e8ebe7; --muted:#9aa19d; --line:#2c3135; --accent:#8ea8ff; --accent-ink:#0f1430; --chip:#232a44; --far:#5b625f; --figbg:#141719; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--display);font-size:clamp(34px,7vw,52px);line-height:1;margin:0;font-weight:700;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+.lede{color:var(--muted);margin:4px 0 0;max-width:62ch}
+h2{font-family:var(--display);font-size:24px;text-transform:uppercase;margin:0;letter-spacing:.02em}
+.controls{display:flex;flex-direction:column;gap:14px}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;gap:4px}
+.seg button{flex:1;font:inherit;font-weight:600;border:0;background:transparent;color:var(--muted);padding:10px 8px;border-radius:7px;cursor:pointer;min-width:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible,.phase:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.phase{font:inherit;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.phase .pn{font-family:var(--display);font-size:20px;text-transform:uppercase;line-height:1.1}
+.phase .pd{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.phase[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.now{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;background:var(--chip);color:var(--accent);padding:1px 6px;border-radius:4px;margin-top:4px;align-self:flex-start}
+.phase-head{display:flex;flex-direction:column;gap:4px}
+.phase-head p{margin:0;color:var(--muted)}
+.sessions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card-top .days{font-size:12px;color:var(--muted)}
+ol.ex{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+ol.ex li{display:grid;grid-template-columns:118px minmax(0,1fr);gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.fig{width:100%;height:auto;aspect-ratio:160/140;max-width:100%;background:var(--figbg);border-radius:8px;display:block}
+.txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+@media (max-width:420px){ol.ex li{grid-template-columns:104px minmax(0,1fr);gap:12px}}
+ol.ex li:first-child{border-top:0;padding-top:0}
+.name{font-weight:600}
+.dose{font-variant-numeric:tabular-nums;font-weight:500;white-space:nowrap;text-align:right}
+.note{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.demo{grid-column:1/-1;justify-self:start;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--chip);padding:4px 10px;border-radius:6px;margin-top:4px}
+.demo:hover{text-decoration:underline}
+.demo:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bench{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td input{width:64px;font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;max-width:66ch}
+.small{font-size:13px;color:var(--muted);margin:0}
+@media (max-width:520px){.phase .pn{font-size:17px}.phase{padding:8px 10px}}
+@media (prefers-reduced-motion:no-preference){.seg button,.phase{transition:background .15s,box-shadow .15s,border-color .15s}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Oct 19 – Dec 31, 2026 · Advanced · 4 days/week</span>
+    <h1>Year-End Core Block</h1>
+    <p class="lede">Alternate Session A and B four days a week, for example A Mon, B Tue, A Thu, B Sat. Flip the switch to swap in no-equipment versions on days you don't have a gym.</p>
+  </header>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Equipment">
+      <button id="mode-gym" type="button" data-mode="gym" aria-pressed="true">Full gym</button>
+      <button id="mode-none" type="button" data-mode="none" aria-pressed="false">No equipment</button>
+    </div>
+    <div class="phases" id="phases"></div>
+  </div>
+
+  <section class="phase-head">
+    <h2 id="phase-title"></h2>
+    <p id="phase-goal"></p>
+  </section>
+
+  <div class="sessions" id="sessions"></div>
+
+  <section class="card">
+    <div class="card-top"><h2>Weekly finisher</h2><span class="days">Once a week, after a B session</span></div>
+    <p class="small">Endurance work, about 10 minutes. Go straight from one exercise to the next and rest 90 sec between rounds. End the set if your low back lifts off the floor. Never do this before a strength session.</p>
+    <div id="finisher"></div>
+  </section>
+
+  <section class="bench">
+    <h2>Benchmarks</h2>
+    <p class="small">Test on Oct 19, Nov 8, Dec 6 and Dec 31. Use the same version each time, gym or no-gym. Numbers you type stay on this device only.</p>
+    <div class="tbl"><table id="bench"></table></div>
+  </section>
+
+  <section class="bench">
+    <h2>Rules</h2>
+    <ul class="rules">
+      <li>Train core after your main lifts or on separate days, so heavy squats and deadlifts don't suffer.</li>
+      <li>Move up only when every set is clean: ribs down, no low-back arching, steady breathing.</li>
+      <li>Carries are measured in distance, not time: 130 ft is about 50 steps, under a minute of walking.</li>
+      <li>Rest 60–90 sec between sets, 2 min on dragon flags and front lever work.</li>
+      <li>Deload for a week, cutting volume about 40%, if your low back feels beat up.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+// Stick-figure rig: side view, y down, angles in degrees (0 = right, 90 = down).
+const FIG=(function(){
+const R=Math.PI/180, GY=133;
+const D=a=>[Math.cos(a*R),Math.sin(a*R)];
+const add=(P,a,l)=>{const d=D(a);return [P[0]+l*d[0],P[1]+l*d[1]]};
+const LT=36,LU=20,LF=18,LH=24,LS=24;
+const STAND={t:-90,ua:92,fa:90,th:90,sh:90};
+
+const M={
+ hang_knees:{props:["bar"],k:[
+  {a:"hand",x:80,y:10,t:-90,ua:-90,fa:-90,th:90,sh:90},
+  {a:"hand",x:80,y:10,t:-118,ua:-80,fa:-88,th:-80,sh:60}]},
+ ttb:{props:["bar"],k:[
+  {a:"hand",x:80,y:10,t:-90,ua:-90,fa:-90,th:90,sh:90},
+  {a:"hand",x:80,y:10,t:-25,ua:-105,fa:-100,th:-82,sh:-82}]},
+ lever:{props:["bar"],k:[
+  {a:"hand",x:100,y:10,t:-90,ua:-90,fa:-90,th:90,sh:90},
+  {a:"hand",x:100,y:10,t:0,ua:-62,fa:-62,th:-15,sh:100}]},
+ wheel_knees:{props:["wheel"],k:[
+  {a:"knee",x:40,y:128,th:90,sh:180,t:-25,ua:95,fa:90},
+  {a:"knee",x:40,y:128,th:165,sh:180,t:-8,ua:12,fa:10}]},
+ wheel_stand:{props:["wheel"],k:[
+  {a:"foot",x:22,y:130,th:95,sh:95,t:10,ua:88,fa:88},
+  {a:"foot",x:22,y:130,th:175,sh:175,t:-5,ua:5,fa:5}]},
+ walkout:{k:[
+  {a:"foot",x:22,y:130,th:95,sh:95,t:10,ua:88,fa:88},
+  {a:"foot",x:22,y:130,th:170,sh:170,t:-10,ua:10,fa:10}]},
+ fallout:{props:["towelHands"],k:[
+  {a:"foot",x:26,y:130,th:155,sh:155,t:-25,ua:90,fa:90},
+  {a:"foot",x:26,y:130,th:170,sh:170,t:-10,ua:10,fa:10}]},
+ bodysaw:{props:["towelFeet"],k:[
+  {a:"hand",x:112,y:130,fa:0,ua:65,t:-12,th:168,sh:168},
+  {a:"hand",x:112,y:130,fa:0,ua:115,t:-12,th:168,sh:168}]},
+ plank_reach:{k:[
+  {a:"foot",x:26,y:130,th:155,sh:155,t:-25,ua:90,fa:90},
+  {a:"foot",x:26,y:130,th:155,sh:155,t:-25,ua:-12,fa:-12,ua2:90,fa2:90}]},
+ cph:{k:[
+  {a:"hand",x:56,y:130,fa:0,ua:90,t:190,th:-20,sh:-8,th2:-5,sh2:5,ua2:14,fa2:14},
+  {a:"hand",x:56,y:130,fa:0,ua:90,t:175,th:-4,sh:-4,th2:12,sh2:12,ua2:14,fa2:14}]},
+ sideplank:{k:[
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:202,th:22,sh:8,ua2:14,fa2:14},
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:194,th:14,sh:14,ua2:14,fa2:14}]},
+ sideplank_leg:{k:[
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:194,th:14,sh:14,th2:14,sh2:14,ua2:14,fa2:14},
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:194,th:14,sh:14,th2:-14,sh2:-14,ua2:14,fa2:14}]},
+ sideplank_reach:{k:[
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:194,th:14,sh:14,ua2:-90,fa2:-90},
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:194,th:14,sh:14,ua2:120,fa2:170}]},
+ pallof:{props:["band"],k:[
+  {x:90,y:86,t:-90,th:78,sh:100,ua:80,fa:-60},
+  {x:90,y:86,t:-90,th:78,sh:100,ua:0,fa:0}]},
+ landmine:{props:["landmine"],k:[
+  {x:100,y:85,t:-90,th:75,sh:95,th2:105,sh2:85,ua:70,fa:55},
+  {x:100,y:85,t:-90,th:75,sh:95,th2:105,sh2:85,ua:-50,fa:-45}]},
+ twist:{props:["jugHands"],k:[
+  {x:78,y:124,t:235,th:-35,sh:25,ua:20,fa:-10},
+  {x:78,y:124,t:235,th:-35,sh:25,ua:75,fa:100}]},
+ lsit:{k:[
+  {a:"hand",x:70,y:112,ua:90,fa:90,t:-90,th:40,sh:10},
+  {a:"hand",x:70,y:112,ua:90,fa:90,t:-90,th:0,sh:0}]},
+ vsit:{k:[
+  {a:"hand",x:70,y:112,ua:90,fa:90,t:-90,th:40,sh:10},
+  {a:"hand",x:70,y:112,ua:95,fa:90,t:-80,th:-35,sh:-35}]},
+ revcrunch:{k:[
+  {a:"shoulder",x:40,y:127,hd:180,t:180,th:-50,sh:20,ua:2,fa:0},
+  {a:"shoulder",x:40,y:127,hd:180,t:162,th:-125,sh:-30,ua:2,fa:0}]},
+ flplank:{k:[
+  {a:"hand",x:112,y:130,fa:0,ua:90,t:-6,th:175,sh:165},
+  {a:"hand",x:112,y:130,fa:0,ua:90,t:-12,th:168,sh:168}]},
+ llplank:{k:[
+  {a:"hand",x:118,y:130,fa:0,ua:90,t:-12,th:168,sh:168},
+  {a:"hand",x:118,y:130,fa:0,ua:118,t:-12,th:168,sh:168}]},
+ stirpot:{props:["ball"],k:[
+  {a:"hand",x:116,y:107,fa:0,ua:78,t:-31,th:149,sh:149},
+  {a:"hand",x:116,y:107,fa:0,ua:104,t:-31,th:149,sh:149}]},
+ sideplank_dip:{k:[
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:214,th:34,sh:0,ua2:14,fa2:14},
+  {a:"hand",x:46,y:130,fa:0,ua:90,t:186,th:6,sh:20,ua2:14,fa2:14}]},
+ crossup:{k:[
+  {x:84,y:126,t:180,hd:180,th:-8,sh:-4,th2:-8,sh2:-4,ua:205,fa:20,ua2:155,fa2:-20},
+  {x:84,y:126,t:228,hd:228,th:-6,sh:-4,th2:-75,sh2:45,ua:265,fa:85,ua2:200,fa2:40}]},
+ scissors:{k:[
+  {x:84,y:127,t:196,th:-6,sh:-6,th2:-28,sh2:-28,ua:196,fa:192},
+  {x:84,y:127,t:196,th:-28,sh:-28,th2:-6,sh2:-6,ua:196,fa:192}]},
+ dragon:{props:["benchL"],k:[
+  {a:"shoulder",x:40,y:106,hd:180,ua:185,fa:120,t:120,th:-60,sh:-60},
+  {a:"shoulder",x:40,y:106,hd:180,ua:185,fa:120,t:178,th:-2,sh:-2}]},
+ dragon_floor:{props:["couchL"],k:[
+  {a:"shoulder",x:40,y:127,hd:180,ua:185,fa:180,t:120,th:-60,sh:-60},
+  {a:"shoulder",x:40,y:127,hd:180,ua:185,fa:180,t:178,th:-2,sh:-2}]},
+ hollow:{k:[
+  {x:84,y:127,t:180,th:0,sh:0,ua:180,fa:180},
+  {x:84,y:127,t:196,th:-14,sh:-12,ua:196,fa:192}]},
+ vup:{k:[
+  {x:84,y:126,t:180,th:0,sh:0,ua:180,fa:180},
+  {x:84,y:126,t:232,th:-52,sh:-52,ua:305,fa:310}]},
+ tuckup:{k:[
+  {x:84,y:126,t:180,th:0,sh:0,ua:180,fa:180},
+  {x:84,y:126,t:230,th:-70,sh:30,ua:320,fa:330}]},
+ wipers:{k:[
+  {x:96,y:127,t:180,ua:160,fa:175,th:-55,sh:-55},
+  {x:96,y:127,t:180,ua:160,fa:175,th:-125,sh:-125}]},
+ carry:{walk:1,k:[
+  {x:80,y:84,t:-90,th:70,sh:95,th2:110,sh2:85,ua:92,fa:90,ua2:110,fa2:100},
+  {x:80,y:84,t:-90,th:110,sh:85,th2:70,sh2:95,ua:92,fa:90,ua2:75,fa2:85}]},
+ carry_oh:{props:["kbUp"],walk:1,k:[
+  {x:80,y:84,t:-90,th:70,sh:95,th2:110,sh2:85,ua:-90,fa:-90,ua2:100,fa2:95},
+  {x:80,y:84,t:-90,th:110,sh:85,th2:70,sh2:95,ua:-90,fa:-90,ua2:80,fa2:85}]},
+ bear:{walk:1,k:[
+  {x:70,y:100,t:-12,ua:80,fa:95,ua2:100,fa2:85,th:90,sh:165,th2:80,sh2:160},
+  {x:72,y:100,t:-12,ua:100,fa:85,ua2:80,fa2:95,th:80,sh:160,th2:90,sh2:165}]},
+ tgu:{pp:1,k:[
+  {x:66,y:126,t:180,th:0,sh:0,ua:-90,fa:-90,ua2:170,fa2:180,th2:0,sh2:0},
+  {x:66,y:126,t:235,th:-45,sh:70,ua:-90,fa:-90,ua2:120,fa2:110,th2:0,sh2:0},
+  {x:70,y:104,t:-90,th:10,sh:90,ua:-90,fa:-90,ua2:100,fa2:95,th2:100,sh2:175},
+  {x:80,y:84,t:-90,th:90,sh:90,ua:-90,fa:-90,ua2:92,fa2:90,th2:90,sh2:90}]}
+};
+
+const MAP={
+ "Hanging knee-to-elbow":["hang_knees"],
+ "Reverse crunch":["revcrunch"],
+ "Cross-body sit-up":["crossup"],
+ "Hollow scissors":["scissors"],
+ "Weighted reverse crunch":["revcrunch",["footDb"]],
+ "Reverse crunch, 3-sec lower":["revcrunch"],
+ "Hanging oblique knee raise":["hang_knees"],
+ "Side plank hip lift":["sideplank_dip"],
+ "Weighted forearm plank":["flplank",["plateBack"]],
+ "Long-lever forearm plank":["llplank"],
+ "Stir-the-pot on a stability ball":["stirpot"],
+ "Stir-the-pot, bigger circles":["stirpot"],
+ "Tuck-up to V-sit":["tuckup"],
+ "Ab wheel from knees, full range":["wheel_knees"],
+ "Plank walkout to full reach":["walkout"],
+ "Copenhagen plank":["cph",["benchR"]],
+ "Copenhagen plank on a couch or chair":["cph",["couchR"]],
+ "Heavy suitcase carry":["carry",["db"]],
+ "Backpack or water-jug suitcase carry":["carry",["jug"]],
+ "Dragon flag negatives":["dragon"],
+ "Dragon flag negatives on the floor":["dragon_floor"],
+ "Pallof press":["pallof"],
+ "Plank with long arm reach":["plank_reach"],
+ "L-sit on parallettes":["lsit",["par"]],
+ "L-sit between two sturdy chairs":["lsit",["chair"]],
+ "Weighted side plank":["sideplank",["plate"]],
+ "Side plank, top leg raised":["sideplank_leg"],
+ "Strict toes-to-bar":["ttb"],
+ "V-ups":["vup"],
+ "Standing ab wheel, partial range":["wheel_stand"],
+ "Towel body saw from feet":["bodysaw"],
+ "Weighted Copenhagen plank":["cph",["benchR","plate"]],
+ "Long-lever Copenhagen plank":["cph",["couchR"]],
+ "Single-arm overhead carry":["carry_oh"],
+ "Bear crawl":["bear"],
+ "Full dragon flags":["dragon"],
+ "Full dragon flags on the floor":["dragon_floor"],
+ "Landmine rotations":["landmine"],
+ "Slow Russian twist with loaded backpack":["twist"],
+ "L-sit":["lsit",["par"]],
+ "L-sit between chairs":["lsit",["chair"]],
+ "Heavy Turkish get-up":["tgu",["kbUp"]],
+ "Turkish get-up with water jug or backpack":["tgu",["kbUp"]],
+ "Weighted toes-to-bar":["ttb",["footDb"]],
+ "Slow V-ups, 3-sec lower":["vup"],
+ "Standing ab wheel, deeper each week":["wheel_stand"],
+ "Towel fallout from feet":["fallout"],
+ "Windshield wipers, hanging or lying":["wipers"],
+ "Lying windshield wipers":["wipers"],
+ "Farmer + suitcase carry medley":["carry",["db","db2"]],
+ "Backpack carry + bear crawl medley":["bear"],
+ "Dragon flags, 2-sec pause":["dragon"],
+ "Dragon flags on the floor, 2-sec pause":["dragon_floor"],
+ "Tuck to advanced-tuck front lever":["lever"],
+ "Hollow hold, arms overhead":["hollow"],
+ "V-sit or L-sit":["vsit",["par"]],
+ "V-sit or L-sit between chairs":["vsit",["chair"]],
+ "Heavy Pallof press, 3-sec hold":["pallof"],
+ "Side plank reach-through, slow":["sideplank_reach"]
+};
+
+const KEYS=["x","y","t","ua","fa","ua2","fa2","th","sh","th2","sh2","hd"];
+function norm(p){const o=Object.assign({},p);
+ if(o.ua2==null)o.ua2=o.ua; if(o.fa2==null)o.fa2=o.fa;
+ if(o.th2==null)o.th2=o.th; if(o.sh2==null)o.sh2=o.sh;
+ if(o.hd==null)o.hd=o.t; o.a=o.a||"hip"; return o}
+function solve(p){let H,S,E,W,K,F;
+ const P=[p.x,p.y];
+ if(p.a==="hand"){W=P;E=add(W,p.fa,-LF);S=add(E,p.ua,-LU);H=add(S,p.t,-LT)}
+ else if(p.a==="foot"){F=P;K=add(F,p.sh,-LS);H=add(K,p.th,-LH)}
+ else if(p.a==="knee"){K=P;H=add(K,p.th,-LH)}
+ else if(p.a==="shoulder"){S=P;H=add(S,p.t,-LT)}
+ else H=P;
+ S=add(H,p.t,LT);E=add(S,p.ua,LU);W=add(E,p.fa,LF);K=add(H,p.th,LH);F=add(K,p.sh,LS);
+ const E2=add(S,p.ua2,LU),W2=add(E2,p.fa2,LF),K2=add(H,p.th2,LH),F2=add(K2,p.sh2,LS);
+ return {H,S,E,W,K,F,E2,W2,K2,F2,N:add(S,p.hd,11)}}
+const f=n=>n.toFixed(1);
+const ln=(a,b,c,w)=>`<line x1="${f(a[0])}" y1="${f(a[1])}" x2="${f(b[0])}" y2="${f(b[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+const pl=(pts,c,w)=>`<polyline points="${pts.map(p=>f(p[0])+","+f(p[1])).join(" ")}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const rc=(x,y,w,h,c,r)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${r||0}" fill="${c}"/>`;
+function prop(name,J,C){const A=C.prop,W=J.W,W2=J.W2,H=J.H,F=J.F;
+ switch(name){
+ case "bar":return ln([W[0]-45,W[1]],[W[0]+45,W[1]],A,4)+ln([W[0]-45,0],[W[0]-45,W[1]],A,2)+ln([W[0]+45,0],[W[0]+45,W[1]],A,2);
+ case "wheel":return `<circle cx="${f(W[0])}" cy="${GY-7}" r="7" fill="none" stroke="${A}" stroke-width="3"/>`+`<circle cx="${f(W[0])}" cy="${GY-7}" r="1.8" fill="${A}"/>`;
+ case "towelHands":return rc(W[0]-9,GY-4,18,3,A,1);
+ case "towelFeet":return rc(J.F[0]-9,GY-4,18,3,A,1);
+ case "benchR":return rc(104,104,54,5,A,1)+ln([110,109],[110,GY],A,3)+ln([152,109],[152,GY],A,3);
+ case "couchR":return rc(102,100,60,33,A,4);
+ case "benchL":return rc(6,112,112,5,A,1)+ln([14,117],[14,GY],A,3)+ln([110,117],[110,GY],A,3);
+ case "couchL":return rc(-4,100,10,33,A,3);
+ case "par":return ln([W[0]-10,W[1]+3],[W[0]+10,W[1]+3],A,3)+ln([W[0]-8,W[1]+3],[W[0]-12,GY],A,2.5)+ln([W[0]+8,W[1]+3],[W[0]+12,GY],A,2.5);
+ case "chair":return ln([W[0]-14,W[1]+3],[W[0]+12,W[1]+3],A,3)+ln([W[0]-13,W[1]+3],[W[0]-13,GY],A,2.5)+ln([W[0]+11,W[1]+3],[W[0]+11,GY],A,2.5)+ln([W[0]-13,W[1]+3],[W[0]-13,W[1]-24],A,2.5);
+ case "band":return rc(2,58,5,GY-58,A,1)+ln([7,74],W,A,1.6);
+ case "landmine":{const dx=W[0]-6,dy=W[1]-131,l=Math.hypot(dx,dy),e=[W[0]+dx/l*10,W[1]+dy/l*10];return ln([6,131],e,A,3.5)}
+ case "jugHands":return rc(W[0]-6,W[1]-5,12,12,A,3);
+ case "db":return rc(W[0]-8,W[1]-1,16,3,A,1)+rc(W[0]-9,W[1]-4,4,9,A,1)+rc(W[0]+5,W[1]-4,4,9,A,1);
+ case "db2":return rc(W2[0]-8,W2[1]-1,16,3,A,1)+rc(W2[0]-9,W2[1]-4,4,9,A,1)+rc(W2[0]+5,W2[1]-4,4,9,A,1);
+ case "jug":return rc(W[0]-6,W[1],12,15,A,3);
+ case "kbUp":return `<circle cx="${f(W[0])}" cy="${f(W[1]-7)}" r="6" fill="${A}"/>`;
+ case "plate":return rc(H[0]-9,H[1]-7,18,4,A,1);
+ case "plateBack":{const m=[(H[0]+J.S[0])/2,(H[1]+J.S[1])/2];return rc(m[0]-10,m[1]-9,20,4,A,1)}
+ case "ball":return `<circle cx="${f((J.E[0]+W[0])/2)}" cy="${GY-13}" r="13" fill="none" stroke="${A}" stroke-width="3"/>`;
+ case "footDb":return rc(F[0]-3,F[1]-8,6,12,A,2);
+ }return ""}
+function draw(p,props,C){const J=solve(p);let s="";
+ s+=ln([0,GY+1],[160,GY+1],C.ground,1.5);
+ for(const n of props)s+=prop(n,J,C);
+ s+=pl([J.S,J.E2,J.W2],C.far,5)+pl([J.H,J.K2,J.F2],C.far,5.5);
+ s+=ln(J.H,J.S,C.ink,7)+pl([J.H,J.K,J.F],C.ink,5.5)+pl([J.S,J.E,J.W],C.ink,5);
+ s+=`<circle cx="${f(J.N[0])}" cy="${f(J.N[1])}" r="7.5" fill="${C.ink}"/>`;
+ return s}
+function lerp(a,b,u){const o={a:a.a};for(const k of KEYS)o[k]=a[k]+(b[k]-a[k])*u;return o}
+const ease=u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+function spec(name){const m=MAP[name];if(!m)return null;const mo=M[m[0]];
+ let k=mo.k.map(norm); if(mo.pp)k=k.concat(k.slice(1,-1).reverse());
+ return {k,props:(mo.props||[]).concat(m[1]||[]),walk:!!mo.walk}}
+function at(sp,time){const n=sp.k.length,mv=sp.walk?.55:1.1,hd=sp.walk?.05:.7,seg=mv+hd;
+ const tt=(time%(seg*n)),i=Math.floor(tt/seg),r=tt-i*seg;
+ const a=sp.k[i],b=sp.k[(i+1)%n];
+ return r<hd?a:lerp(a,b,ease((r-hd)/mv))}
+return {spec,draw,at,M,MAP,norm};
+})();
+
+
+const PHASES=[
+ {id:"p1",name:"Phase 1",dates:"Oct 19 – Nov 8",start:"2026-10-19",end:"2026-11-08",title:"Weeks 1–3 · Strength base",goal:"Own the positions under load before you push range.",
+  A:[
+   {gym:["Hanging knee-to-elbow","4 × 10"],none:["Tuck-up to V-sit","4 × 12","Lower slowly, don't let feet touch."]},
+   {gym:["Weighted forearm plank","4 × 30 s"],none:["Long-lever forearm plank","4 × 30 s"]},
+   {gym:["Reverse crunch","3 × 15"],none:["Reverse crunch","3 × 15"]},
+   {gym:["Heavy suitcase carry","4 × 130 ft/side"],none:["Backpack or water-jug suitcase carry","4 × 130 ft/side","Load the bag with books or bottles."]}
+  ],
+  B:[
+   {gym:["Dragon flag negatives","4 × 5","5-sec lower."],none:["Dragon flag negatives on the floor","4 × 5","Grip a couch leg or door frame. 5-sec lower."]},
+   {gym:["Pallof press","3 × 12/side"],none:["Plank with long arm reach","3 × 10/side","Hips stay square to the floor."]},
+   {gym:["L-sit on parallettes","5 × 10–15 s"],none:["L-sit between two sturdy chairs","5 × 10–15 s"]},
+   {gym:["Weighted side plank","3 × 30 s/side"],none:["Side plank, top leg raised","3 × 30 s/side"]}
+  ]},
+ {id:"p2",name:"Phase 2",dates:"Nov 9 – Dec 6",start:"2026-11-09",end:"2026-12-06",title:"Weeks 4–7 · Load and range",goal:"Longer levers, more range, heavier carries.",
+  A:[
+   {gym:["Strict toes-to-bar","4 × 8"],none:["V-ups","4 × 12","Straight legs, touch your shins."]},
+   {gym:["Stir-the-pot on a stability ball","4 × 6 circles/side"],none:["Towel body saw from feet","4 × 8","Feet on towels on a smooth floor, rock forward from forearms."]},
+   {gym:["Hanging oblique knee raise","3 × 8/side"],none:["Side plank hip lift","3 × 12/side"]},
+   {gym:["Single-arm overhead carry","3 × 100 ft/side"],none:["Bear crawl","3 × 65 ft","Knees an inch off the floor, back flat."]}
+  ],
+  B:[
+   {gym:["Full dragon flags","4 × 4–6"],none:["Full dragon flags on the floor","4 × 4–6"]},
+   {gym:["Landmine rotations","3 × 10/side"],none:["Slow Russian twist with loaded backpack","3 × 10/side","Rotate from the ribs, not the arms."]},
+   {gym:["L-sit","5 × 20 s"],none:["L-sit between chairs","5 × 20 s"]},
+   {gym:["Heavy Turkish get-up","3 × 3/side"],none:["Turkish get-up with water jug or backpack","3 × 3/side"]}
+  ]},
+ {id:"p3",name:"Phase 3",dates:"Dec 7 – Dec 31",start:"2026-12-07",end:"2026-12-31",title:"Weeks 8–11 · Peak skills",goal:"Heavier, longer and more controlled. Retest in the final week.",
+  A:[
+   {gym:["Weighted toes-to-bar","4 × 6"],none:["Slow V-ups, 3-sec lower","4 × 10"]},
+   {gym:["Stir-the-pot, bigger circles","4 × 8 circles/side"],none:["Towel fallout from feet","4 × 5","Slide hands forward from a plank on a smooth floor."]},
+   {gym:["Windshield wipers, hanging or lying","3 × 8/side"],none:["Lying windshield wipers","3 × 8/side","Straight legs, shoulders pinned."]},
+   {gym:["Farmer + suitcase carry medley","4 rounds"],none:["Backpack carry + bear crawl medley","4 rounds","130 ft carry (about 50 steps), then 65 ft crawl."]}
+  ],
+  B:[
+   {gym:["Dragon flags, 2-sec pause","4 × 5"],none:["Dragon flags on the floor, 2-sec pause","4 × 5"]},
+   {gym:["Tuck to advanced-tuck front lever","5 × 8–12 s"],none:["Hollow hold, arms overhead","5 × 30–40 s"]},
+   {gym:["V-sit or L-sit","5 × 25–30 s"],none:["V-sit or L-sit between chairs","5 × 25–30 s"]},
+   {gym:["Heavy Pallof press, 3-sec hold","3 × 10/side"],none:["Side plank reach-through, slow","3 × 10/side"]}
+  ]}
+];
+const CUES={
+ "Cross-body sit-up":"Sit up and twist your shoulder toward the opposite knee as it bends in. Keep the other leg extended and hovering.",
+ "Hollow scissors":"Hold a hollow position, low back pressed down, and cross your straight legs over and under each other.",
+ "Reverse crunch":"Lie on your back, knees bent. Curl your hips off the floor toward your chest, then lower slowly.",
+ "Weighted reverse crunch":"Reverse crunch with a light dumbbell held between your feet.",
+ "Reverse crunch, 3-sec lower":"Reverse crunch, taking 3 seconds to lower your hips back down.",
+ "Hanging oblique knee raise":"Hang from a bar and raise your knees up and across toward one elbow. Alternate sides.",
+ "Side plank hip lift":"In a forearm side plank, lower your hip toward the floor, then lift it as high as you can.",
+ "Weighted forearm plank":"Forearm plank with a plate on your upper back. Squeeze your glutes and keep a flat back.",
+ "Long-lever forearm plank":"Forearm plank with your elbows a few inches ahead of your shoulders. It's much harder than it looks.",
+ "Stir-the-pot on a stability ball":"Forearm plank with your elbows on a ball. Draw small circles with your elbows without letting your hips move.",
+ "Stir-the-pot, bigger circles":"Same as stir-the-pot, with wider circles. Keep your hips completely still.",
+ "Hanging knee-to-elbow":"Hang from a bar and curl your knees up to touch your elbows. Lower without swinging.",
+ "Ab wheel from knees, full range":"Kneel and roll out until your chest nearly reaches the floor. Pull back with your abs, not your hips.",
+ "Copenhagen plank":"Side plank with your top leg on a bench and the bottom leg hovering. Your inner thigh holds you up.",
+ "Heavy suitcase carry":"Walk holding one heavy dumbbell at your side. Stay perfectly upright and don't lean.",
+ "Pallof press":"Stand side-on to a cable or band. Press the handle straight out from your chest and don't let it twist you.",
+ "L-sit on parallettes":"Press up on the handles and hold your legs straight out, parallel to the floor.",
+ "Weighted side plank":"Side plank with a plate resting on your top hip.",
+ "Strict toes-to-bar":"Hang and raise straight legs until your toes touch the bar. No swinging.",
+ "Standing ab wheel, partial range":"Start standing, roll out only as far as you can control, then roll back.",
+ "Weighted Copenhagen plank":"Copenhagen plank with a plate on your top hip.",
+ "Single-arm overhead carry":"Walk with a kettlebell or dumbbell locked out overhead in one hand.",
+ "Dragon flag negatives":"Lie on a bench gripping it behind your head. Lift your body straight up onto your shoulders, then lower as one rigid line.",
+ "Full dragon flags":"Lie on a bench gripping it behind your head. Lower and raise your whole body as one straight line from the shoulders.",
+ "Landmine rotations":"Hold the end of a barbell anchored in a corner and swing it in an arc from hip to hip, arms straight.",
+ "L-sit":"Hands on parallettes or the floor, press up and hold straight legs out in front.",
+ "Heavy Turkish get-up":"Lie holding a weight overhead and stand up step by step, arm locked the whole time. Reverse to lie back down.",
+ "Weighted toes-to-bar":"Toes-to-bar with ankle weights or a light dumbbell held between your feet.",
+ "Windshield wipers, hanging or lying":"Legs pointed straight up, lower them to one side and then the other, like wipers.",
+ "Farmer + suitcase carry medley":"130 ft (about 50 steps) with a heavy weight in each hand, then 130 ft per side holding just one.",
+ "Dragon flags, 2-sec pause":"Dragon flags with a 2-second hold halfway down.",
+ "Tuck to advanced-tuck front lever":"Hang from a bar and pull your body horizontal with knees tucked. Advanced tuck: flat back, knees further out.",
+ "V-sit or L-sit":"Hold your legs up in front of you. In a V-sit your legs point higher than horizontal.",
+ "Heavy Pallof press, 3-sec hold":"Pallof press, holding your arms extended for 3 seconds each rep.",
+ "Copenhagen plank on a couch or chair":"Side plank with your top leg on the couch seat and the bottom leg hovering.",
+ "L-sit between two sturdy chairs":"Hands on two chair seats, press up and hold straight legs out in front.",
+ "Side plank, top leg raised":"Side plank, then lift your top leg and hold it up the whole time.",
+ "Full dragon flags on the floor":"Lie on your back gripping a couch leg behind your head. Lower and raise your body as one straight line.",
+ "L-sit between chairs":"Hands on two chair seats, press up and hold straight legs out in front.",
+ "Turkish get-up with water jug or backpack":"Lie holding the jug overhead and stand up step by step, arm locked. Reverse to lie back down.",
+ "Slow V-ups, 3-sec lower":"V-ups, taking 3 seconds to lower back down.",
+ "Dragon flags on the floor, 2-sec pause":"Floor dragon flags with a 2-second hold halfway down.",
+ "Hollow hold, arms overhead":"Lie on your back, press your low back into the floor, lift shoulders and legs with arms by your ears.",
+ "V-sit or L-sit between chairs":"Hands on two chair seats, lift and hold your legs as high as you can.",
+ "Side plank reach-through, slow":"In a side plank, thread your top arm under your body, then reach it up to the ceiling."
+};
+const QUERY={
+ "Farmer + suitcase carry medley":"farmer carry",
+ "Backpack carry + bear crawl medley":"bear crawl",
+ "Tuck to advanced-tuck front lever":"advanced tuck front lever",
+ "Towel body saw from feet":"body saw exercise",
+ "Towel fallout from feet":"ab fallout sliders",
+ "Plank walkout to full reach":"plank walkout",
+ "Plank with long arm reach":"plank arm reach",
+ "Slow Russian twist with loaded backpack":"russian twist"
+};
+function demoUrl(n){
+  const q=QUERY[n]||n.split(",")[0].replace(/ on (a|the) .*| between .*| with (water|loaded) .*/i,"");
+  return "https://www.youtube.com/results?search_query="+encodeURIComponent(q+" exercise how to");
+}
+const FINISHER=[
+ {gym:["Cross-body sit-up","3 × 12/side"],none:["Cross-body sit-up","3 × 12/side"]},
+ {gym:["Hollow scissors","3 × 30"],none:["Hollow scissors","3 × 30"]}
+];
+const BENCH=[["Strict toes-to-bar (max)","Max V-ups"],["L-sit hold (sec)","L-sit hold (sec)"],["Dragon flags (max)","Dragon flags (max)"],["Long-lever plank hold (sec)","Long-lever plank hold (sec)"]];
+const DATES=["Oct 19","Nov 8","Dec 6","Dec 31"];
+
+function load(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+
+const today=new Date().toISOString().slice(0,10);
+const currentId=(PHASES.find(p=>today>=p.start&&today<=p.end)||PHASES[0]).id;
+let mode=load("core-mode","gym");
+let phaseId=currentId;
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function renderPhases(){
+  document.getElementById("phases").innerHTML=PHASES.map(p=>
+    `<button class="phase" id="tab-${p.id}" type="button" data-id="${p.id}" aria-pressed="${p.id===phaseId}">
+      <span class="pn">${p.name}</span><span class="pd">${p.dates}</span>${p.id===currentId?'<span class="now">This week</span>':''}</button>`).join("");
+}
+function exList(items){
+  return `<ol class="ex">${items.map(it=>{const [n,d,note]=it[mode];
+    const cue=note||CUES[n]||"";
+    return `<li><svg class="fig" viewBox="0 0 160 140" data-name="${esc(n)}" role="img" aria-label="Animated figure: ${esc(n)}"></svg><div class="txt"><div class="row"><span class="name">${esc(n)}</span><span class="dose">${esc(d)}</span></div>${cue?`<span class="note">${esc(cue)}</span>`:""}<a class="demo" href="${demoUrl(n)}" target="_blank" rel="noopener">Video on YouTube</a></div></li>`}).join("")}</ol>`;
+}
+function renderPhase(){
+  const p=PHASES.find(x=>x.id===phaseId);
+  document.getElementById("phase-title").textContent=p.title;
+  document.getElementById("phase-goal").textContent=p.goal;
+  document.getElementById("finisher").innerHTML=exList(FINISHER);
+  document.getElementById("sessions").innerHTML=
+   `<article class="card"><div class="card-top"><h2>Session A</h2><span class="days">e.g. Mon · Thu</span></div>${exList(p.A)}</article>
+    <article class="card"><div class="card-top"><h2>Session B</h2><span class="days">e.g. Tue · Sat</span></div>${exList(p.B)}</article>`;
+}
+function renderBench(){
+  const i=mode==="gym"?0:1;
+  let h=`<thead><tr><th>Test</th>${DATES.map(d=>`<th>${d}</th>`).join("")}</tr></thead><tbody>`;
+  BENCH.forEach((b,r)=>{
+    h+=`<tr><td>${esc(b[i])}</td>${DATES.map((d,c)=>{const id=`b-${mode}-${r}-${c}`;
+      return `<td><input id="${id}" inputmode="numeric" aria-label="${esc(b[i])} on ${d}" value="${esc(load(id,""))}"></td>`}).join("")}</tr>`;
+  });
+  document.getElementById("bench").innerHTML=h+"</tbody>";
+}
+function renderMode(){
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===mode));
+}
+function all(){renderMode();renderPhases();renderPhase();renderBench();paint(performance.now())}
+
+document.querySelector(".seg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mode=b.dataset.mode;save("core-mode",mode);all()});
+document.getElementById("phases").addEventListener("click",e=>{const b=e.target.closest(".phase");if(!b)return;phaseId=b.dataset.id;renderPhases();renderPhase();paint(performance.now())});
+document.getElementById("bench").addEventListener("input",e=>{if(e.target.id)save(e.target.id,e.target.value)});
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+let C=null,cAge=0;
+function colors(){const cs=getComputedStyle(document.documentElement),g=v=>cs.getPropertyValue(v).trim();
+  return {ink:g("--ink"),far:g("--far"),prop:g("--accent"),ground:g("--line")}}
+function paint(now){
+  if(!C||++cAge>60){C=colors();cAge=0}
+  const t=now/1000;
+  document.querySelectorAll("svg.fig").forEach(svg=>{
+    if(!svg._sp)svg._sp=FIG.spec(svg.dataset.name);
+    const sp=svg._sp;if(!sp)return;
+    const p=reduce?sp.k[1]:FIG.at(sp,t);
+    svg.innerHTML=FIG.draw(p,sp.props,C);
+  });
+}
+let last=0;
+function loop(now){if(now-last>33){paint(now);last=now}requestAnimationFrame(loop)}
+all();
+if(!reduce)requestAnimationFrame(loop);
+else if(window.matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{C=null;paint(0)});
+</script>
+
+</body>
+</html>
